@@ -1,0 +1,34 @@
+version: '3.8'
+
+services:
+  mongodb:
+    image: mongo:latest
+    container_name: mongodb
+    ports:
+      - "27017:27017"
+    networks:
+      - finance-net
+    volumes:
+      - mongo-data:/data/db
+
+  finance-transactions-api:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: finance-transactions-api
+    ports:
+      - "8080:8080"
+    networks:
+      - finance-net
+    environment:
+      - SPRING_DATA_MONGODB_URI=mongodb://mongodb:27017/finance-transactions
+
+networks:
+  finance-net:
+    driver: bridge
+    ipam:
+      config:
+        - subnet: 172.25.0.0/16
+
+volumes:
+  mongo-data:
